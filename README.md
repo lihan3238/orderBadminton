@@ -2,8 +2,8 @@
 
 ## 功能
 
-- 定期监测[羽毛球场地](https://workflow.cuc.edu.cn/reservation/fe/site/appointmentscreen?id=1293)的使用情况
-- 根据 [API](https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293) 数据，有空闲场地自动邮件通知
+- 定期监测羽毛球场地的使用情况
+- 今明两日空闲场地自动邮件通知
 
 ## 使用
 
@@ -48,7 +48,7 @@ go run main.go
 - 默认每 30s 监测一次场地使用情况，如需修改，请在 `/static/script.js` 中修改 `setInterval` 的参数:
 
 ```js
-setInterval(updateStatus, 30000);//将 30000 修改为你想要的时间间隔（单位：ms）
+setInterval(updateStatus, 15000);//将 15000 修改为你想要的时间间隔（单位：ms）
 ```
 
 ### 2-从 EXE 应用部署
@@ -98,6 +98,13 @@ project/
 setInterval(updateStatus, 30000);//将 30000 修改为你想要的时间间隔（单位：ms）
 ```
 
+## API 规则
+
+- [羽毛球场地](https://workflow.cuc.edu.cn/reservation/fe/site/appointmentscreen?id=1293)为无需登录的当日羽毛球场地核销情况页面。
+
+- [羽毛球场地](https://workflow.cuc.edu.cn/reservation/fe/site/appointmentscreen?id=1293)的数据来自 [API：(https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293](https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293)，其中 `id=1293` 为室内羽毛球场地的 id。
+
+- [API：(https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=n](https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1294)，其中 `id=1294-1303` 时，数据为一到十号场地 day-2 到 day+4 的七日预约情况。
 
 ## 声明
 

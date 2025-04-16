@@ -5,19 +5,31 @@ function updateStatus() {
             const statusDiv = document.getElementById('status');
             const listDiv = document.getElementById('roomList');
 
-            if (data.available) {
-                statusDiv.textContent = '✅ 有空闲场地';
-                statusDiv.style.color = 'green';
+            const today = data.today_available || [];
+            const tomorrow = data.tomorrow_available || [];
 
-                // 显示空闲场地名称列表
-                listDiv.innerHTML = '<strong>空闲场地：</strong><ul>' +
-                    data.rooms.map(room => `<li>${room}</li>`).join('') +
-                    '</ul>';
-            } else {
+            if (today.length === 0 && tomorrow.length === 0) {
                 statusDiv.textContent = '❌ 场地已被预约';
                 statusDiv.style.color = 'red';
                 listDiv.innerHTML = '';
+                return;
             }
+
+            statusDiv.textContent = '✅ 有空闲场地';
+            statusDiv.style.color = 'green';
+
+            let html = '';
+            if (today.length > 0) {
+                html += '<strong>今天空闲场地：</strong><ul>' +
+                    today.map(room => `<li>${room}</li>`).join('') +
+                    '</ul>';
+            }
+            if (tomorrow.length > 0) {
+                html += '<strong>明天空闲场地：</strong><ul>' +
+                    tomorrow.map(room => `<li>${room}</li>`).join('') +
+                    '</ul>';
+            }
+            listDiv.innerHTML = html;
         })
         .catch(error => {
             console.error('获取状态失败:', error);
@@ -26,6 +38,5 @@ function updateStatus() {
 
 // 初始加载
 updateStatus();
-
-// 每隔 30 秒更新一次状态
-setInterval(updateStatus, 30000);
+// 每隔 15 秒更新一次状态
+setInterval(updateStatus, 15000);

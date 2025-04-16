@@ -7,36 +7,37 @@ import (
 	"net/smtp"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// 定义结构体来解析 API 返回的 JSON 数据
+// API结构体
 type TimeSlot struct {
-	ID        int    `json:"id"`
-	StrTime   string `json:"str_time"`
-	StartTime string `json:"start_time"`
-	EndTime   string `json:"end_time"`
+	ID      int    `json:"id"`
+	StrTime string `json:"str_time"`
 }
-
 type Resource struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
-
-type Data struct {
-	Time     []TimeSlot           `json:"time"`
-	Resource []Resource           `json:"resource"`
-	Data     map[int]map[int]Sign `json:"data"`
+type LargeScreenData struct {
+	Time     []TimeSlot `json:"time"`
+	Resource []Resource `json:"resource"`
+	Data     map[int]map[int]struct {
+		Occupy bool   `json:"occupy"`
+		User   string `json:"user"`
+	} `json:"data"`
 }
-
-type Sign struct {
-	SignStatus int    `json:"sign_status"`
-	Occupy     bool   `json:"occupy"`
-	User       string `json:"user"`
+type DetailedData struct {
+	Time []TimeSlot `json:"time"`
+	Day  []string   `json:"day"`
+	Data map[string]map[string]struct {
+		Status   int     `json:"status"`
+		Username *string `json:"username"`
+		Text     string  `json:"text"`
+	} `json:"data"`
 }
-
-// 定义配置结构体
 type EmailConfig struct {
 	From     string   `json:"from"`
 	Password string   `json:"password"`
@@ -45,114 +46,118 @@ type EmailConfig struct {
 	SMTPPort string   `json:"smtp_port"`
 }
 
-// 声明全局配置变量
 var emailConfig EmailConfig
 
-// 加载配置
 func loadEmailConfig(filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&emailConfig)
-	if err != nil {
-		return err
-	}
-	return nil
+	return json.NewDecoder(file).Decode(&emailConfig)
 }
 
 func main() {
-	err := loadEmailConfig("email_config.json")
-	if err != nil {
+	if err := loadEmailConfig("email_config.json"); err != nil {
 		fmt.Println("加载邮件配置失败:", err)
 		return
 	}
 
 	r := gin.Default()
 	r.Static("/static", "./static")
-
 	r.GET("/", func(c *gin.Context) {
 		c.File("./static/index.html")
 	})
-
 	r.GET("/api/status", func(c *gin.Context) {
-		availableRooms := checkAvailability()
-		if len(availableRooms) > 0 {
-			sendEmailNotification(availableRooms)
+		today, tomorrow := checkTodayAvailability(), checkTomorrowAvailability()
+		if len(today)+len(tomorrow) > 0 {
+			sendEmailNotification(today, tomorrow)
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"available": len(availableRooms) > 0,
-			"rooms":     availableRooms,
+			"today_available":    today,
+			"tomorrow_available": tomorrow,
 		})
 	})
-
 	r.Run(":8080")
 }
 
-// checkAvailability 访问新的 API 并解析是否有空闲场地
-func checkAvailability() []string {
-	url := "https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293"
-
-	// 发送 GET 请求获取 JSON 数据
-	resp, err := http.Get(url)
+func checkTodayAvailability() []string {
+	resp, err := http.Get("https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293")
 	if err != nil {
 		fmt.Println("请求失败:", err)
 		return nil
 	}
 	defer resp.Body.Close()
 
-	// 解析 JSON 数据
-	var apiResponse struct {
-		E string `json:"e"`
-		M string `json:"m"`
-		D Data   `json:"d"`
+	var result struct {
+		D LargeScreenData `json:"d"`
 	}
-
-	err = json.NewDecoder(resp.Body).Decode(&apiResponse)
-	if err != nil {
-		fmt.Println("解析 JSON 失败:", err)
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		fmt.Println("JSON解析失败:", err)
 		return nil
 	}
 
-	var availableRooms []string
-
-	// 遍历每个场地及其预约情况
-	for _, resource := range apiResponse.D.Resource {
-		// 遍历每个时间段
-		for _, timeSlot := range apiResponse.D.Time {
-			roomData := apiResponse.D.Data[resource.ID]
-			slotData := roomData[timeSlot.ID]
-			// 如果该时间段没有被占用，标记该场地为空闲
-			if !slotData.Occupy {
-				availableRooms = append(availableRooms, fmt.Sprintf("%s - %s", resource.Name, timeSlot.StrTime))
+	var free []string
+	for _, res := range result.D.Resource {
+		for _, slot := range result.D.Time {
+			if info, ok := result.D.Data[res.ID][slot.ID]; ok && !info.Occupy {
+				free = append(free, fmt.Sprintf("【今天】%s %s", res.Name, slot.StrTime))
 			}
 		}
 	}
-
-	return availableRooms
+	return free
 }
 
-// sendEmailNotification 发送邮件通知
-func sendEmailNotification(availableRooms []string) {
-	subject := "空闲场地提醒"
-	body := fmt.Sprintf("以下场地是空闲的：\n\n%s", strings.Join(availableRooms, "\n"))
-	message := []byte(fmt.Sprintf("Subject: %s\r\n\r\n%s", subject, body))
+func checkTomorrowAvailability() []string {
+	tomorrow := time.Now().Add(24 * time.Hour).Format("2006-01-02")
+	var free []string
+	for id := 1294; id <= 1303; id++ {
+		url := fmt.Sprintf("https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=%d", id)
+		resp, err := http.Get(url)
+		if err != nil {
+			fmt.Println("请求失败:", err)
+			continue
+		}
+		var result struct {
+			D DetailedData `json:"d"`
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			fmt.Println("JSON解析失败:", err)
+			resp.Body.Close()
+			continue
+		}
+		resp.Body.Close()
+
+		dayData, exists := result.D.Data[tomorrow]
+		if !exists {
+			continue
+		}
+		for _, slot := range result.D.Time {
+			slotID := fmt.Sprintf("%d", slot.ID)
+			if item, ok := dayData[slotID]; ok && item.Username == nil {
+				free = append(free, fmt.Sprintf("【明天】场地ID %d %s", id-1293, slot.StrTime))
+			}
+		}
+	}
+	return free
+}
+
+func sendEmailNotification(today, tomorrow []string) {
+	subject := "羽毛球场地空闲提醒"
+	var body strings.Builder
+	if len(today) > 0 {
+		body.WriteString("今天空闲场地:\n" + strings.Join(today, "\n") + "\n\n")
+	}
+	if len(tomorrow) > 0 {
+		body.WriteString("明天空闲场地:\n" + strings.Join(tomorrow, "\n"))
+	}
+	message := []byte(fmt.Sprintf("Subject: %s\r\n\r\n%s", subject, body.String()))
 
 	auth := smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SMTPHost)
-
-	err := smtp.SendMail(
-		emailConfig.SMTPHost+":"+emailConfig.SMTPPort,
-		auth,
-		emailConfig.From,
-		emailConfig.To,
-		message,
-	)
+	err := smtp.SendMail(emailConfig.SMTPHost+":"+emailConfig.SMTPPort, auth, emailConfig.From, emailConfig.To, message)
 	if err != nil {
 		fmt.Println("邮件发送失败:", err)
-		return
+	} else {
+		fmt.Println("邮件发送成功")
 	}
-	fmt.Println("邮件发送成功")
 }
