@@ -55,7 +55,7 @@ setInterval(updateStatus, 30000);//将 30000 修改为你想要的时间间隔�
 
 1. 下载 EXE 应用
 
-从 Github 下载[orderBadminton](https://github.com/lihan3238/orderBadminton/releases/download/0.1.0/orderBadminton_v0.0.1.exe)
+从 Github 下载[orderBadminton](https://github.com/lihan3238/orderBadminton/releases/latest)
 
 2. 目录结构
     
