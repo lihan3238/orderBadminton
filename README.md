@@ -29,9 +29,10 @@ go get github.com/gin-gonic/gin
     "from": "xxx@xxx.com",          // 发件人邮箱
     "password": "qwedqwwdqw",       // 发件人邮箱授权码（SMTP）
     "to": [                         // 需要接收提醒的收件人邮箱
-        "lihan3238@163.com"
+        "xxx@xxx.com",
+        "mmm@mmm.com"
     ],
-    "smtp_host": "smtp.163.com",    // SMTP服务器地址
+    "smtp_host": "smtp.xxx.com",    // SMTP服务器地址
     "smtp_port": "25"               // SMTP服务器端口（非SSL）
 }
 ```
