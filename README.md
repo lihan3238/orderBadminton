@@ -98,13 +98,16 @@ project/
 setInterval(updateStatus, 30000);//将 30000 修改为你想要的时间间隔（单位：ms）
 ```
 
-## API 规则
+## 注意
 
 - [羽毛球场地](https://workflow.cuc.edu.cn/reservation/fe/site/appointmentscreen?id=1293)为无需登录的当日羽毛球场地核销情况页面。
 
 - [羽毛球场地](https://workflow.cuc.edu.cn/reservation/fe/site/appointmentscreen?id=1293)的数据来自 [API：(https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293](https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293)，其中 `id=1293` 为室内羽毛球场地的 id。
 
 - [API：(https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=n](https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1294)，其中 `id=1294-1303` 时，数据为一到十号场地 day-2 到 day+4 的七日预约情况。
+
+- 163 邮箱 SMTP 服务器地址为 `smtp.163.com`，非 SSL 端口为 `25`，SSL 端口为 `465`。
+- QQ 邮箱 SMTP 服务器地址为 `smtp.qq.com`，SSL 端口为 `465`。
 
 ## 声明
 
