@@ -51,6 +51,8 @@ type EmailConfig struct {
 
 var emailConfig EmailConfig
 
+var lastAvailableSummary string
+
 func loadEmailConfig(filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -73,14 +75,22 @@ func main() {
 	})
 	r.GET("/api/status", func(c *gin.Context) {
 		today, tomorrow := checkTodayAvailability(), checkTomorrowAvailability()
-		if len(today)+len(tomorrow) > 0 {
+
+		// 构建当前这次的摘要（用换行连接确保顺序一致）
+		currentSummary := strings.Join(append(today, tomorrow...), "\n")
+
+		// 如果内容不同才发邮件
+		if currentSummary != "" && currentSummary != lastAvailableSummary {
 			sendEmailNotification(today, tomorrow)
+			lastAvailableSummary = currentSummary
 		}
+
 		c.JSON(http.StatusOK, gin.H{
 			"today_available":    today,
 			"tomorrow_available": tomorrow,
 		})
 	})
+
 	r.Run(":8080")
 }
 
@@ -228,5 +238,6 @@ func sendEmailNotification(today, tomorrow []string) {
 		fmt.Println("消息发送失败:", err)
 	}
 	wc.Close()
-	fmt.Println("邮件发送成功")
+	fmt.Println("邮件发送成功，时间：", time.Now().Format("15:04:05"))
+
 }
