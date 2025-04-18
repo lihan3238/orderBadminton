@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"mime"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -143,21 +146,87 @@ func checkTomorrowAvailability() []string {
 }
 
 func sendEmailNotification(today, tomorrow []string) {
+	// 构造昵称和 From 头（RFC2047 编码）
 	subject := "羽毛球场地空闲提醒"
-	var body strings.Builder
+	nickname := "CUCBadminton 小助手"
+	encodedNickname := mime.BEncoding.Encode("UTF-8", nickname)
+	fromHeader := fmt.Sprintf("%s <%s>", encodedNickname, emailConfig.From)
+
+	// 构造邮件正文并 Base64 编码
+	var bodyBuilder strings.Builder
 	if len(today) > 0 {
-		body.WriteString("今天空闲场地:\n" + strings.Join(today, "\n") + "\n\n")
+		bodyBuilder.WriteString("今天空闲场地:\n" + strings.Join(today, "\n") + "\n\n")
 	}
 	if len(tomorrow) > 0 {
-		body.WriteString("明天空闲场地:\n" + strings.Join(tomorrow, "\n"))
+		bodyBuilder.WriteString("明天空闲场地:\n" + strings.Join(tomorrow, "\n"))
 	}
-	message := []byte(fmt.Sprintf("Subject: %s\r\n\r\n%s", subject, body.String()))
+	bodyEncoded := base64.StdEncoding.EncodeToString([]byte(bodyBuilder.String()))
 
-	auth := smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SMTPHost)
-	err := smtp.SendMail(emailConfig.SMTPHost+":"+emailConfig.SMTPPort, auth, emailConfig.From, emailConfig.To, message)
-	if err != nil {
-		fmt.Println("邮件发送失败:", err)
-	} else {
-		fmt.Println("邮件发送成功")
+	// 完整邮件消息（含 MIME 头）
+	msg := []byte(fmt.Sprintf(
+		"From: %s\r\n"+
+			"To: %s\r\n"+
+			"Subject: =?UTF-8?B?%s?=\r\n"+
+			"MIME-Version: 1.0\r\n"+
+			"Content-Type: text/plain; charset=UTF-8\r\n"+
+			"Content-Transfer-Encoding: base64\r\n\r\n"+
+			"%s",
+		fromHeader,
+		strings.Join(emailConfig.To, ", "),
+		base64.StdEncoding.EncodeToString([]byte(subject)),
+		bodyEncoded,
+	))
+
+	// --- 隐式 TLS 连接 (SMTPS) ---
+	addr := emailConfig.SMTPHost + ":" + emailConfig.SMTPPort
+	// 1. 建立 TLS 连接
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,                 // 如需校验证书，请设为 false，并确保 System CA 可用
+		ServerName:         emailConfig.SMTPHost, // 用于 SNI
 	}
+	conn, err := tls.Dial("tcp", addr, tlsConfig) // 隐式 TLS 握手&#8203;:contentReference[oaicite:6]{index=6}
+	if err != nil {
+		fmt.Println("TLS 连接失败:", err)
+		return
+	}
+	defer conn.Close()
+
+	// 2. 创建 SMTP 客户端
+	client, err := smtp.NewClient(conn, emailConfig.SMTPHost)
+	if err != nil {
+		fmt.Println("SMTP 客户端创建失败:", err)
+		return
+	}
+	defer client.Quit()
+
+	// 3. 认证
+	auth := smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SMTPHost) // port independent :contentReference[oaicite:7]{index=7}
+	if err = client.Auth(auth); err != nil {
+		fmt.Println("认证失败:", err)
+		return
+	}
+
+	// 4. 发件人 & 收件人
+	if err = client.Mail(emailConfig.From); err != nil {
+		fmt.Println("发件人设置失败:", err)
+		return
+	}
+	for _, rcpt := range emailConfig.To {
+		if err = client.Rcpt(rcpt); err != nil {
+			fmt.Println("收件人设置失败:", err)
+			return
+		}
+	}
+
+	// 5. 写入消息体
+	wc, err := client.Data()
+	if err != nil {
+		fmt.Println("进入 Data 模式失败:", err)
+		return
+	}
+	if _, err = wc.Write(msg); err != nil {
+		fmt.Println("消息发送失败:", err)
+	}
+	wc.Close()
+	fmt.Println("邮件发送成功")
 }
