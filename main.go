@@ -111,8 +111,22 @@ func checkTodayAvailability() []string {
 	}
 
 	var free []string
+	now := time.Now()
+	todayDate := now.Format("2006-01-02") // 当前日期
+
 	for _, res := range result.D.Resource {
 		for _, slot := range result.D.Time {
+			// 拼接完整时间字符串
+			fullTimeStr := fmt.Sprintf("%s %s", todayDate, slot.StrTime)
+			startTime, err := time.ParseInLocation("2006-01-02 15:04", fullTimeStr, time.Local)
+			if err != nil {
+				fmt.Println("时间解析失败:", fullTimeStr)
+				continue
+			}
+			if now.After(startTime) {
+				// 当前时间晚于场次开始时间，跳过
+				continue
+			}
 			if info, ok := result.D.Data[res.ID][slot.ID]; ok && !info.Occupy {
 				free = append(free, fmt.Sprintf("【今天】%s %s", res.Name, slot.StrTime))
 			}
