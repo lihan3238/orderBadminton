@@ -116,8 +116,14 @@ func checkTodayAvailability() []string {
 
 	for _, res := range result.D.Resource {
 		for _, slot := range result.D.Time {
-			// 拼接完整时间字符串
-			fullTimeStr := fmt.Sprintf("%s %s", todayDate, slot.StrTime)
+			// 从 "15:00-16:00" 中提取起始时间 "15:00"
+			timeParts := strings.Split(slot.StrTime, "-")
+			if len(timeParts) < 1 {
+				continue
+			}
+			startTimeStr := strings.TrimSpace(timeParts[0])
+			fullTimeStr := fmt.Sprintf("%s %s", todayDate, startTimeStr)
+
 			startTime, err := time.ParseInLocation("2006-01-02 15:04", fullTimeStr, time.Local)
 			if err != nil {
 				fmt.Println("时间解析失败:", fullTimeStr)
