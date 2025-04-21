@@ -45,7 +45,7 @@ go get github.com/gin-gonic/gin
 go run main.go
 ```
 
-- 默认每 30s 监测一次场地使用情况，如需修改，请在 `/static/script.js` 中修改 `setInterval` 的参数:
+- 默认每 15s 监测一次场地使用情况，如需修改，请在 `/static/script.js` 中修改 `setInterval` 的参数:
 
 ```js
 setInterval(updateStatus, 15000);//将 15000 修改为你想要的时间间隔（单位：ms）
