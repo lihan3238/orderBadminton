@@ -1,1 +1,280 @@
-{"e":"OK","m":"","d":{"time":[{"id":103823,"str_time":"15:00-16:00","start_time":"15:00:00","end_time":"16:00:00"},{"id":103824,"str_time":"16:00-17:00","start_time":"16:00:00","end_time":"17:00:00"},{"id":103825,"str_time":"17:00-18:00","start_time":"17:00:00","end_time":"18:00:00"},{"id":103826,"str_time":"18:00-19:00","start_time":"18:00:00","end_time":"19:00:00"},{"id":103827,"str_time":"19:00-20:00","start_time":"19:00:00","end_time":"20:00:00"},{"id":132898,"str_time":"20:00-21:00","start_time":"20:00:00","end_time":"21:00:00"}],"day":["2025-04-14","2025-04-15","2025-04-16","2025-04-17","2025-04-18","2025-04-19","2025-04-20"],"data":{"2025-04-14":{"103823":{"status":3,"username":"樊亚宁","text":""},"103824":{"status":3,"username":"教服中心","text":""},"103825":{"status":3,"username":"教服中心","text":""},"103826":{"status":3,"username":"教服中心","text":""},"103827":{"status":3,"username":"吕俊珂","text":""},"132898":{"status":3,"username":"侯堂奥","text":""}},"2025-04-15":{"103823":{"status":3,"username":"段婕","text":""},"103824":{"status":3,"username":"武岳","text":""},"103825":{"status":3,"username":"范伟健","text":""},"103826":{"status":3,"username":"黄文昕","text":""},"103827":{"status":3,"username":"黄文昕","text":""},"132898":{"status":3,"username":"孙兆能","text":""}},"2025-04-16":{"103823":{"status":3,"username":"刘芷航","text":""},"103824":{"status":3,"username":"教服中心","text":""},"103825":{"status":0,"username":"教服中心","text":""},"103826":{"status":0,"username":"教服中心","text":""},"103827":{"status":0,"username":"教服中心","text":""},"132898":{"status":0,"username":"夏听雨","text":""}},"2025-04-17":{"103823":{"status":0,"username":"徐瀚祺","text":""},"103824":{"status":0,"username":"教服中心","text":""},"103825":{"status":0,"username":"教服中心","text":""},"103826":{"status":0,"username":"教服中心","text":""},"103827":{"status":0,"username":"教服中心","text":""},"132898":{"status":0,"username":"朱俊杰","text":""}},"2025-04-18":{"103823":{"status":0,"username":null,"text":""},"103824":{"status":0,"username":"教服中心","text":""},"103825":{"status":0,"username":"教服中心","text":""},"103826":{"status":0,"username":"教服中心","text":""},"103827":{"status":0,"username":"教服中心","text":""},"132898":{"status":0,"username":null,"text":""}},"2025-04-19":{"103823":{"status":0,"username":"教服中心","text":""},"103824":{"status":0,"username":"教服中心","text":""},"103825":{"status":0,"username":null,"text":""},"103826":{"status":0,"username":null,"text":""},"103827":{"status":0,"username":null,"text":""},"132898":{"status":0,"username":null,"text":""}},"2025-04-20":{"103823":{"status":0,"username":"教服中心","text":""},"103824":{"status":0,"username":"教服中心","text":""},"103825":{"status":0,"username":null,"text":""},"103826":{"status":0,"username":null,"text":""},"103827":{"status":0,"username":null,"text":""},"132898":{"status":0,"username":null,"text":""}}}}}
+{
+    "e": "OK",
+    "m": "",
+    "d": {
+        "time": [
+            {
+                "id": 103823,
+                "str_time": "15:00-16:00",
+                "start_time": "15:00:00",
+                "end_time": "16:00:00"
+            },
+            {
+                "id": 103824,
+                "str_time": "16:00-17:00",
+                "start_time": "16:00:00",
+                "end_time": "17:00:00"
+            },
+            {
+                "id": 103825,
+                "str_time": "17:00-18:00",
+                "start_time": "17:00:00",
+                "end_time": "18:00:00"
+            },
+            {
+                "id": 103826,
+                "str_time": "18:00-19:00",
+                "start_time": "18:00:00",
+                "end_time": "19:00:00"
+            },
+            {
+                "id": 103827,
+                "str_time": "19:00-20:00",
+                "start_time": "19:00:00",
+                "end_time": "20:00:00"
+            },
+            {
+                "id": 132898,
+                "str_time": "20:00-21:00",
+                "start_time": "20:00:00",
+                "end_time": "21:00:00"
+            }
+        ],
+        "day": [
+            "2025-06-12",
+            "2025-06-13",
+            "2025-06-14",
+            "2025-06-15",
+            "2025-06-16",
+            "2025-06-17",
+            "2025-06-18"
+        ],
+        "data": {
+            "2025-06-12": {
+                "103823": {
+                    "sign_status": 2,
+                    "occupy": true,
+                    "user": "赵*均"
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103825": {
+                    "sign_status": 2,
+                    "occupy": true,
+                    "user": "曾*斌"
+                },
+                "103826": {
+                    "sign_status": 2,
+                    "occupy": true,
+                    "user": "于*乐"
+                },
+                "103827": {
+                    "sign_status": 1,
+                    "occupy": true,
+                    "user": "陈*梁"
+                },
+                "132898": {
+                    "sign_status": 1,
+                    "occupy": true,
+                    "user": "陈*梁"
+                }
+            },
+            "2025-06-13": {
+                "103823": {
+                    "sign_status": 0,
+                    "occupy": true,
+                    "user": "胡*溪"
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": true,
+                    "user": "胡*溪"
+                },
+                "103825": {
+                    "sign_status": 0,
+                    "occupy": true,
+                    "user": "袁*"
+                },
+                "103826": {
+                    "sign_status": 0,
+                    "occupy": true,
+                    "user": "张*妍"
+                },
+                "103827": {
+                    "sign_status": 0,
+                    "occupy": true,
+                    "user": "南*元"
+                },
+                "132898": {
+                    "sign_status": 0,
+                    "occupy": true,
+                    "user": "南*元"
+                }
+            },
+            "2025-06-14": {
+                "103823": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103825": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103826": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103827": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "132898": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                }
+            },
+            "2025-06-15": {
+                "103823": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103825": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103826": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103827": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "132898": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                }
+            },
+            "2025-06-16": {
+                "103823": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103825": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103826": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103827": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "132898": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                }
+            },
+            "2025-06-17": {
+                "103823": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103825": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103826": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103827": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "132898": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                }
+            },
+            "2025-06-18": {
+                "103823": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103824": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103825": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103826": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "103827": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                },
+                "132898": {
+                    "sign_status": 0,
+                    "occupy": false,
+                    "user": ""
+                }
+            }
+        },
+        "id": 1296
+    }
+}

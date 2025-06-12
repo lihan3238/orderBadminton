@@ -20,25 +20,14 @@ type TimeSlot struct {
 	ID      int    `json:"id"`
 	StrTime string `json:"str_time"`
 }
-type Resource struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-type LargeScreenData struct {
-	Time     []TimeSlot `json:"time"`
-	Resource []Resource `json:"resource"`
-	Data     map[int]map[int]struct {
-		Occupy bool   `json:"occupy"`
-		User   string `json:"user"`
-	} `json:"data"`
-}
+
 type DetailedData struct {
 	Time []TimeSlot `json:"time"`
 	Day  []string   `json:"day"`
 	Data map[string]map[string]struct {
-		Status   int     `json:"status"`
-		Username *string `json:"username"`
-		Text     string  `json:"text"`
+		Sign_status int    `json:"sign_status"`
+		Occupy      bool   `json:"occupy"`
+		User        string `json:"user"`
 	} `json:"data"`
 }
 type EmailConfig struct {
@@ -74,7 +63,9 @@ func main() {
 		c.File("./static/index.html")
 	})
 	r.GET("/api/status", func(c *gin.Context) {
-		today, tomorrow := checkTodayAvailability(), checkTomorrowAvailability()
+		today_date := time.Now().Format("2006-01-02")
+		tomorrow_date := time.Now().Add(24 * time.Hour).Format("2006-01-02")
+		today, tomorrow := checkAvailability(today_date), checkAvailability(tomorrow_date)
 
 		// 构建当前这次的摘要（用换行连接确保顺序一致）
 		currentSummary := strings.Join(append(today, tomorrow...), "\n")
@@ -94,55 +85,14 @@ func main() {
 	r.Run(":8080")
 }
 
-func checkTodayAvailability() []string {
-	resp, err := http.Get("https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=1293")
-	if err != nil {
-		fmt.Println("请求失败:", err)
-		return nil
+func checkAvailability(date string) []string {
+	//tomorrow := time.Now().Add(24 * time.Hour).Format("2006-01-02")
+	date_name := date
+	if date == time.Now().Format("2006-01-02") {
+		date_name = "今天"
+	} else if date == time.Now().Add(24*time.Hour).Format("2006-01-02") {
+		date_name = "明天"
 	}
-	defer resp.Body.Close()
-
-	var result struct {
-		D LargeScreenData `json:"d"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		fmt.Println("JSON解析失败:", err)
-		return nil
-	}
-
-	var free []string
-	now := time.Now()
-	todayDate := now.Format("2006-01-02") // 当前日期
-
-	for _, res := range result.D.Resource {
-		for _, slot := range result.D.Time {
-			// 从 "15:00-16:00" 中提取起始时间 "15:00"
-			timeParts := strings.Split(slot.StrTime, "-")
-			if len(timeParts) < 1 {
-				continue
-			}
-			startTimeStr := strings.TrimSpace(timeParts[0])
-			fullTimeStr := fmt.Sprintf("%s %s", todayDate, startTimeStr)
-
-			startTime, err := time.ParseInLocation("2006-01-02 15:04", fullTimeStr, time.Local)
-			if err != nil {
-				fmt.Println("时间解析失败:", fullTimeStr)
-				continue
-			}
-			if now.After(startTime) {
-				// 当前时间晚于场次开始时间，跳过
-				continue
-			}
-			if info, ok := result.D.Data[res.ID][slot.ID]; ok && !info.Occupy {
-				free = append(free, fmt.Sprintf("【今天】%s %s", res.Name, slot.StrTime))
-			}
-		}
-	}
-	return free
-}
-
-func checkTomorrowAvailability() []string {
-	tomorrow := time.Now().Add(24 * time.Hour).Format("2006-01-02")
 	var free []string
 	for id := 1294; id <= 1303; id++ {
 		url := fmt.Sprintf("https://workflow.cuc.edu.cn/reservation/api/resource/large-screen?id=%d", id)
@@ -161,14 +111,36 @@ func checkTomorrowAvailability() []string {
 		}
 		resp.Body.Close()
 
-		dayData, exists := result.D.Data[tomorrow]
+		now := time.Now()
+
+		dayData, exists := result.D.Data[date]
 		if !exists {
 			continue
 		}
 		for _, slot := range result.D.Time {
+
+			// 从 "15:00-16:00" 中提取起始时间 "15:00"
+			timeParts := strings.Split(slot.StrTime, "-")
+			if len(timeParts) < 1 {
+				continue
+			}
+			startTimeStr := strings.TrimSpace(timeParts[0])
+			fullTimeStr := fmt.Sprintf("%s %s", date, startTimeStr)
+
+			startTime, err := time.ParseInLocation("2006-01-02 15:04", fullTimeStr, time.Local)
+			if err != nil {
+				fmt.Println("时间解析失败:", fullTimeStr)
+				continue
+			}
+			if now.After(startTime) {
+				// 当前时间晚于场次开始时间，跳过
+				//fmt.Println("跳过已开始的场次:", fullTimeStr)
+				continue
+			}
+
 			slotID := fmt.Sprintf("%d", slot.ID)
-			if item, ok := dayData[slotID]; ok && item.Username == nil {
-				free = append(free, fmt.Sprintf("【明天】场地ID %d %s", id-1293, slot.StrTime))
+			if item, ok := dayData[slotID]; ok && !item.Occupy {
+				free = append(free, fmt.Sprintf("【%s】场地ID %d %s", date_name, id-1293, slot.StrTime))
 			}
 		}
 	}
